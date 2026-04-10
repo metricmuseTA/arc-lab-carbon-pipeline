@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARC LAB — AI Environmental Impact Research</title>
+    <meta name="description" content="ARC LAB makes AI's environmental impact visible — in plain language, for everyone.">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0D1117 0%, #1a1f2e 100%);
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        .bg-arcs {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        .arc { position: absolute; width: 300px; height: 300px; border: 2px solid #00E5FF;
+               border-radius: 50%; border-top-color: transparent; border-left-color: transparent;
+               animation: rotate 20s linear infinite; }
+        .arc:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+        .arc:nth-child(2) { top: 50%; right: 15%; animation-delay: 3s; }
+        .arc:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 6s; }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        .hero { min-height: 90vh; display: flex; flex-direction: column; justify-content: center;
+                align-items: center; text-align: center; padding: 80px 20px; }
+
+        .hero-logo { width: 150px; height: 150px; margin-bottom: 30px; animation: pulse 3s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .hero-title { font-family: 'Orbitron', sans-serif; font-size: clamp(4rem, 8vw, 6rem);
+                      font-weight: 900; letter-spacing: 0.1em; margin-bottom: 10px;
+                      background: linear-gradient(135deg, #00E5FF 0%, #0A84FF 100%);
+                      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                      animation: fadeInUp 1s ease-out; }
+
+        .hero-acronym { font-size: clamp(0.85rem, 1.5vw, 1.05rem); color: #8E8E93;
+                        letter-spacing: 0.08em; margin-bottom: 12px;
+                        animation: fadeInUp 1s ease-out 0.1s both; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); }
+                             to { opacity: 1; transform: translateY(0); } }
+
+        .hero-subtitle { font-size: clamp(1.1rem, 2vw, 1.5rem); color: #8E8E93;
+                         margin-bottom: 40px; animation: fadeInUp 1s ease-out 0.2s both; }
+
+        .hero-question { font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-weight: 300;
+                         padding: 30px 50px; border-left: 5px solid #00E5FF;
+                         background: rgba(0, 229, 255, 0.05); backdrop-filter: blur(10px);
+                         animation: fadeInUp 1s ease-out 0.4s both; color: #FFD60A;
+                         font-style: italic; margin-top: 30px; text-align: left; max-width: 800px; }
+
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                     gap: 30px; margin: 80px 0; animation: fadeInUp 1s ease-out 0.6s both; }
+
+        .stat-card { padding: 30px; background: rgba(0, 229, 255, 0.05);
+                     border: 2px solid #00E5FF; border-radius: 20px; text-align: center;
+                     transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0, 229, 255, 0.3); }
+
+        .stat-number { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: 900;
+                       color: #00E5FF; margin-bottom: 10px; }
+        .stat-label { font-size: 0.9rem; color: #8E8E93; text-transform: uppercase; letter-spacing: 1px; }
+
+        .section { margin: 120px 0; }
+        .section-header { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem);
+                          font-weight: 900; margin-bottom: 20px; color: #00E5FF; }
+        .section-intro { font-size: 1.2rem; color: #8E8E93; margin-bottom: 50px; max-width: 800px; line-height: 1.7; }
+
+        /* PROBLEM GRID */
+        .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                        gap: 30px; margin: 50px 0; }
+
+        .problem-card { padding: 40px; background: linear-gradient(135deg, rgba(255, 59, 48, 0.1) 0%, rgba(255, 149, 0, 0.1) 100%);
+                        border: 2px solid rgba(255, 149, 0, 0.5); border-radius: 20px;
+                        transition: all 0.3s ease; }
+        .problem-card:hover { transform: translateX(10px); border-color: #FFD60A; }
+        .problem-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 15px; color: #FFD60A; }
+        .problem-card p { color: #AEAEB2; line-height: 1.6; }
+
+        /* SOLUTION FLOW */
+        .solution-flow { display: flex; flex-direction: column; gap: 30px; margin: 50px 0; }
+        .flow-step { display: flex; gap: 30px; align-items: flex-start; padding: 40px;
+                     background: rgba(0, 229, 255, 0.05); border-left: 5px solid #00E5FF;
+                     border-radius: 15px; transition: all 0.3s ease; }
+        .flow-step:hover { background: rgba(0, 229, 255, 0.1); transform: translateX(10px); }
+        .flow-number { font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: 900;
+                       color: #00E5FF; min-width: 60px; }
+        .flow-content h3 { font-size: 1.6rem; margin-bottom: 12px; color: #00E5FF; }
+        .flow-content p { font-size: 1.05rem; color: #AEAEB2; line-height: 1.6; }
+
+        /* DATA SOURCES */
+        .data-sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                        gap: 30px; margin: 60px 0; }
+
+        .source-card { padding: 35px; background: rgba(28, 28, 30, 0.8);
+                       border: 2px solid #00E5FF; border-radius: 20px; text-align: center;
+                       transition: all 0.3s ease; }
+        .source-card:hover { transform: translateY(-10px); box-shadow: 0 20px 60px rgba(0, 229, 255, 0.3); }
+        .source-icon { font-size: 3rem; margin-bottom: 20px; }
+        .source-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; color: #00E5FF; }
+        .source-desc { color: #AEAEB2; line-height: 1.6; }
+
+        /* TIMELINE */
+        .timeline { position: relative; padding: 40px 0; margin: 60px 0; }
+        .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+                            width: 3px; background: linear-gradient(180deg, #00E5FF 0%, #FFD60A 100%);
+                            transform: translateX(-50%); }
+
+        .timeline-item { display: flex; justify-content: flex-start; padding: 30px 0; position: relative; }
+        .timeline-item:nth-child(even) { justify-content: flex-end; }
+
+        .timeline-content { width: 45%; padding: 30px; background: rgba(0, 229, 255, 0.05);
+                            border: 2px solid #00E5FF; border-radius: 15px; }
+        .timeline-content::before { content: ''; position: absolute; top: 50%; width: 20px; height: 20px;
+                                    background: #00E5FF; border-radius: 50%; box-shadow: 0 0 20px #00E5FF; }
+        .timeline-item:nth-child(odd) .timeline-content::before { right: -60px; }
+        .timeline-item:nth-child(even) .timeline-content::before { left: -60px; }
+
+        .timeline-phase { font-size: 0.9rem; color: #00E5FF; font-weight: 700;
+                          text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .timeline-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+        .timeline-desc { color: #8E8E93; line-height: 1.5; }
+
+        /* FOUNDER */
+        .founder-section { margin: 120px 0; padding: 60px; background: rgba(0,229,255,0.04);
+                           border: 2px solid rgba(0,229,255,0.2); border-radius: 30px; }
+        .founder-section h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.8rem, 3vw, 2.8rem);
+                              font-weight: 900; color: #00E5FF; margin-bottom: 20px; }
+        .founder-section p { font-size: 1.1rem; color: #AEAEB2; line-height: 1.75; margin-bottom: 1rem; max-width: 860px; }
+        .founder-section p:last-child { margin-bottom: 0; }
+
+        /* CTA */
+        .cta-section { margin: 120px 0; padding: 80px 60px;
+                       background: linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(10, 132, 255, 0.1) 100%);
+                       border: 3px solid #00E5FF; border-radius: 30px; text-align: center; }
+        .cta-title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 900;
+                     margin-bottom: 20px; color: #00E5FF; }
+        .cta-text { font-size: 1.2rem; color: #FFFFFF; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+        .cta-stats { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+        .cta-stat-number { font-family: 'Orbitron', sans-serif; font-size: 2.2rem;
+                           font-weight: 900; color: #00E5FF; }
+        .cta-stat-label { font-size: 0.85rem; color: #8E8E93; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+
+        .footer { text-align: center; padding: 60px 20px; color: #8E8E93;
+                  border-top: 1px solid rgba(0, 229, 255, 0.2); }
+        .footer-name { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 900;
+                       color: #00E5FF; margin-bottom: 10px; }
+        .footer a { color: #00E5FF; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .timeline::before { left: 30px; }
+            .timeline-content { width: calc(100% - 80px); margin-left: 60px; }
+            .timeline-item:nth-child(even) { justify-content: flex-start; }
+            .timeline-item:nth-child(even) .timeline-content::before { left: -60px; }
+            .hero-question { padding: 20px 25px; }
+            .founder-section { padding: 40px 30px; }
+            .cta-section { padding: 50px 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-arcs"><div class="arc"></div><div class="arc"></div><div class="arc"></div></div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-logo">
+            <svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00E5FF;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0A84FF;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="M 40 110 Q 75 40, 110 110" stroke="url(#g)" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <circle cx="40" cy="110" r="6" fill="#FFD60A"/>
+                <circle cx="110" cy="110" r="6" fill="#FFD60A"/>
+            </svg>
+        </div>
+        <h1 class="hero-title">ARC LAB</h1>
+        <p class="hero-acronym">AI | Renewable | Consumption Laboratory</p>
+        <p class="hero-subtitle">Independent AI Environmental Impact Research</p>
+        <div class="hero-question">
+            "My daughter told me to stop using AI — because it's terrible for the environment. I said, are you sure? And then I went looking for an answer. I couldn't find one."
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- STATS BAR -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-number">94%</div>
+                <div class="stat-label">Carbon Reduction Possible</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">972 lbs</div>
+                <div class="stat-label">CO₂/MWh Savings Found</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">$0</div>
+                <div class="stat-label">Cost to Access Our Data</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Public Impact</div>
+            </div>
+        </div>
+
+        <!-- THE PROBLEM -->
+        <section class="section">
+            <h2 class="section-header">The Problem</h2>
+            <p class="section-intro">The public has been entirely left out of the conversation about AI's environmental impact. No plain-language tools exist for them. No independent source they can trust.</p>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <h3 class="problem-title">Invisible Impact</h3>
+                    <p>Billions of people use AI every day without any way to see what it costs the grid, the water supply, or the atmosphere.</p>
+                </div>
+                <div class="problem-card">
+                    <h3 class="problem-title">Developer-Only Tools</h3>
+                    <p>Every existing tool that measures AI's carbon footprint is built for engineers and researchers — not the public.</p>
+                </div>
+                <div class="problem-card">
+                    <h3 class="problem-title">Big Tech Opacity</h3>
+                    <p>The companies with the most data have the least incentive to share it. Independent measurement doesn't exist — yet.</p>
+                </div>
+                <div class="problem-card">
+                    <h3 class="problem-title">No Public Accountability</h3>
+                    <p>Without visible data, there's no public pressure for change. The next AI race will be about energy — and the clock is running.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OUR APPROACH -->
+        <section class="section">
+            <h2 class="section-header">Our Approach</h2>
+            <p class="section-intro">Start with real data, make it accessible in plain language, and expand the lens year over year — from carbon to energy to water to resources.</p>
+            <div class="solution-flow">
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="flow-content">
+                        <h3>Start With Carbon</h3>
+                        <p>A live Bronze-to-Gold data pipeline using WattTime CAISO grid data — already built, already published. Real carbon intensity data, translated into plain language anyone can understand.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="flow-content">
+                        <h3>Expand the Lens</h3>
+                        <p>Phase by phase: energy mix (renewable vs. fossil by region), then water consumption, then full resource impact across all AI types. The public lab grows as the data grows.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">3</div>
+                    <div class="flow-content">
+                        <h3>Make It Real-Time</h3>
+                        <p>Move from historical analysis to live tracking — so anyone can see, in this moment, what AI is doing to the planet and when the best time to run workloads actually is.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="flow-content">
+                        <h3>Educate &amp; Empower</h3>
+                        <p>Annual ARC LAB Environmental Impact Reports in plain language — free and public. Education as a catalyst, not just information delivery. Because when ordinary people can finally see AI's true environmental footprint, they become the force that drives the solution.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIVE DATA SECTION -->
+        <section class="section" id="data">
+            <h2 class="section-header">The Data</h2>
+            <p class="section-intro">Real CAISO_NORTH grid data. Real carbon intensity. The chart below shows average CO₂ emissions by hour of day — and exactly why <em style="color:#00E5FF;">when</em> you run AI workloads matters.</p>
+
+            <div style="background:rgba(0,229,255,0.04);border:2px solid rgba(0,229,255,0.2);border-radius:20px;padding:40px;margin:40px 0;">
+                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:30px;">
+                    <div style="text-align:center;">
+                        <div style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#00E5FF;">750.1</div>
+                        <div style="font-size:0.85rem;color:#8E8E93;text-transform:uppercase;letter-spacing:1px;">Avg Intensity (lbs CO₂/MWh)</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#00E5FF;">58.5</div>
+                        <div style="font-size:0.85rem;color:#8E8E93;text-transform:uppercase;letter-spacing:1px;">Cleanest Hour Avg</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#FFD60A;">1,030</div>
+                        <div style="font-size:0.85rem;color:#8E8E93;text-transform:uppercase;letter-spacing:1px;">Dirtiest Hour Avg</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#00E5FF;">2,016</div>
+                        <div style="font-size:0.85rem;color:#8E8E93;text-transform:uppercase;letter-spacing:1px;">Intervals Sampled</div>
+                    </div>
+                </div>
+
+                <div style="position:relative;width:100%;height:280px;margin:10px 0 20px;">
+                    <canvas id="carbonChart"></canvas>
+                </div>
+
+                <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:14px;height:14px;border-radius:50%;background:#ff4444;"></div>
+                        <span style="font-size:0.85rem;color:#8E8E93;">Avoid — High Carbon (Hours 0–14)</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:14px;height:14px;border-radius:50%;background:#00E5FF;"></div>
+                        <span style="font-size:0.85rem;color:#8E8E93;">Optimal — Low Carbon (Hours 15–23)</span>
+                    </div>
+                </div>
+
+                <p style="font-size:0.9rem;color:#8E8E93;text-align:center;margin-bottom:20px;">
+                    CAISO_NORTH grid region · WattTime CO₂ MOER signal · 8 days of 5-minute interval data · Feb–Mar 2026
+                </p>
+
+                <div style="text-align:center;">
+                    <a href="https://github.com/metricmuseTA/arc-lab-carbon-pipeline" target="_blank"
+                       style="display:inline-block;font-family:'Orbitron',sans-serif;font-size:11px;
+                              letter-spacing:0.08em;color:#00E5FF;border:1px solid #00E5FF;
+                              padding:12px 28px;text-decoration:none;transition:all 0.2s;"
+                       onmouseover="this.style.background='#00E5FF';this.style.color='#050d14';"
+                       onmouseout="this.style.background='transparent';this.style.color='#00E5FF';">
+                        View Full Pipeline on GitHub →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA SOURCES -->
+        <section class="section">
+            <h2 class="section-header">Data Sources</h2>
+            <p class="section-intro">ARC LAB is built on publicly available data — independent by design, not by accident.</p>
+            <div class="data-sources">
+                <div class="source-card">
+                    <div class="source-icon">🔌</div>
+                    <h3 class="source-title">Grid Carbon Intensity</h3>
+                    <p class="source-desc">WattTime real-time API — CAISO_NORTH region live. The foundation of ARC LAB's first published pipeline.</p>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon">☀️</div>
+                    <h3 class="source-title">Energy Mix</h3>
+                    <p class="source-desc">CAISO, PJM, ERCOT grid operator APIs. Renewable vs. fossil sources by region, coming in Phase 2.</p>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon">💧</div>
+                    <h3 class="source-title">Water Consumption</h3>
+                    <p class="source-desc">Data center water usage research and public utility reporting — Phase 3 expansion target.</p>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon">📊</div>
+                    <h3 class="source-title">Emissions Data</h3>
+                    <p class="source-desc">EPA eGRID, ElectricityMap, and EIA datasets for validation and cross-referencing findings.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section class="section">
+            <h2 class="section-header">Year One Roadmap</h2>
+            <p class="section-intro">Three phases. Twelve months. One goal: make AI's environmental impact impossible to ignore.</p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Months 1–3 — Phase 1</div>
+                        <div class="timeline-title">Build & Launch</div>
+                        <div class="timeline-desc">Public-facing ARC LAB website live. Carbon intensity data accessible in plain language. LinkedIn and Substack presence established. Cloud research credits secured.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Months 4–6 — Phase 2</div>
+                        <div class="timeline-title">Expand & Grow</div>
+                        <div class="timeline-desc">Energy mix data layer added. Water consumption research begins. Real-time data feeds introduced. Community engagement grows through newsletter and social.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Months 7–12 — Phase 3</div>
+                        <div class="timeline-title">Deepen Impact</div>
+                        <div class="timeline-desc">Water and resource data layers live. First annual ARC LAB Environmental Impact Report published. Year-two funding pursued through public interest technology and AI-climate grant programs.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOUNDER -->
+        <section class="founder-section">
+            <h2>About the Founder</h2>
+            <p>Tiffani Anderson spent 17 years as an architectural design manager supporting Navy construction projects — shepherding $123M in military infrastructure across 6 installations in the Southwest, from RFP through congressional review, design, award, and construction.</p>
+            <p>In 2025 she walked away from that career to chase a belief: that data, used with intention, can change how we understand the world. After discovering a love of data engineering through Zach Wilson's bootcamp, she built and published a live carbon intensity pipeline as a capstone project — and ARC LAB was born.</p>
+            <p>ARC LAB is independent, public-facing, and based in La Mesa, California. All research is free to access. No corporate funding. No agenda. Just the data.</p>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2 class="cta-title">The Next AI Race Is About Energy.</h2>
+            <p class="cta-text">We can't solve what we can't see. ARC LAB makes AI's environmental footprint visible — so ordinary people can look at the data, understand what's happening, and navigate toward a solution together.</p>
+            <div class="cta-stats">
+                <div class="cta-stat">
+                    <div class="cta-stat-number">94%</div>
+                    <div class="cta-stat-label">Carbon Reduction Possible</div>
+                </div>
+                <div class="cta-stat">
+                    <div class="cta-stat-number">Phase 1</div>
+                    <div class="cta-stat-label">Live Now</div>
+                </div>
+                <div class="cta-stat">
+                    <div class="cta-stat-number">Public</div>
+                    <div class="cta-stat-label">Always Free</div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-name">ARC LAB</div>
+            <p>Independent AI Environmental Impact Research | La Mesa, California</p>
+            <p style="margin-top: 15px;">
+                <a href="https://github.com/metricmuseTA/arc-lab-carbon-pipeline" target="_blank">GitHub →</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="https://www.linkedin.com/in/tiffani-anderson" target="_blank">LinkedIn →</a>
+            </p>
+            <p style="margin-top: 20px; font-style: italic;">Where AI energy data arcs toward insight.</p>
+        </footer>
+
+    </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script>
+    // Real CAISO_NORTH hourly avg data derived from ARC LAB Gold table findings
+    // Peak hours 0-14 (~1,000+ lbs CO₂/MWh), optimal hours 15-23 (~58-200 lbs)
+    const hourlyData = [
+      1010, 1015, 1018, 1020, 1022, 1019, 1015, 1010,
+      1005, 1008, 1012, 1025, 1030, 1028, 850, 200,
+      100, 80, 65, 60, 58, 62, 75, 120
+    ];
+    const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+    const colors = hourlyData.map((_, i) =>
+      i <= 14 ? 'rgba(255,68,68,0.85)' : 'rgba(0,229,255,0.85)'
+    );
+    const borders = hourlyData.map((_, i) =>
+      i <= 14 ? '#ff4444' : '#00E5FF'
+    );
+    const ctx = document.getElementById('carbonChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Avg lbs CO₂/MWh',
+          data: hourlyData,
+          backgroundColor: colors,
+          borderColor: borders,
+          borderWidth: 1,
+          borderRadius: 3,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0d2035',
+            titleColor: '#00E5FF',
+            bodyColor: '#e8f4ee',
+            callbacks: { label: ctx => ` ${ctx.parsed.y} lbs CO₂/MWh` }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#7a9ba8', font: { size: 10 } },
+            grid: { color: 'rgba(0,229,255,0.06)' }
+          },
+          y: {
+            ticks: { color: '#7a9ba8', font: { size: 10 } },
+            grid: { color: 'rgba(0,229,255,0.06)' },
+            title: { display: true, text: 'lbs CO₂/MWh', color: '#7a9ba8', font: { size: 11 } }
+          }
+        }
+      }
+    });
+
+    // Scroll fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
